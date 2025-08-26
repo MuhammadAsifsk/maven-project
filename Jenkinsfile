@@ -23,14 +23,51 @@ tools {
                 echo " hello $Name ${params.Lastname}"
                 sh 'mvn clean package'  
                   }
-        
-                         
-        post {
-                success {
-                       archiveArtifacts artifacts: '**/target/*.war'          
-                        }
                 
              }               
             }
+
+        stage('Test') {
+            parallel  {
+
+            stage('testA') {
+                steps {echo " This is test A "}
+            }
+            stage('testB') {
+               steps {echo " This is test B "}
+            } 
+        } 
+
+        post {
+                success {
+                    dir("webapp/target/")
+                    {
+                        stash name: "maven-build", includes: "*.war"         
+                        }
+                }          
+       }
+
+        stage ('deploy_dev')
+        {
+            when {
+                expression { params.select_environment == 'dev' }
+            beforeAgent true
+            agent {
+                label 'Jenkins-Dev'
+            }
+            steps {
+                dir("/var/www/html")
+                {
+                unstash "maven-build"
+                }
+                sh """ cd /var/www/html
+                jar -xvf *.war
+                """
+            }
+        }
+    }
 }
+
+}
+
 }
