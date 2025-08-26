@@ -45,8 +45,8 @@ tools {
                         stash name: "maven-build", includes: "*.war"         
                         }
                 }          
-       }
-
+          }
+        }
         stage ('deploy_dev')
         {
             when {
@@ -67,6 +67,6 @@ tools {
         }
     }
 }
-}
+
 
 
