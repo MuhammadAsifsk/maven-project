@@ -6,10 +6,10 @@ pipeline
 }
 
 parameters {
-  parameters {
-  choice choices: ['dev', 'prod'], name: 'select_environment'
-  }
-
+  choice(
+    name: 'select_environment',
+    choices: ['dev', 'prod'],
+  )
 }
 
     environment {
@@ -60,7 +60,7 @@ tools {
         stage ('deploy_dev')
         {
             when {
-                expression { params.select_environment == 'dev' }
+                expression { params.select_environment == 'dev' } }
             beforeAgent true
             agent {
                 label 'Jenkins-Dev'
@@ -79,7 +79,7 @@ tools {
  }
 
 
-}
+
 
 
 
