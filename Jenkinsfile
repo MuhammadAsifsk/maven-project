@@ -5,6 +5,14 @@ pipeline
   label 'Jenkins-Dev'
 }
 
+parameters {
+  string defaultValue: 'Shaikh', name: 'Lastname'
+}
+
+environment {
+  Name = "Muhammad Asif"
+}
+ 
 tools {
   maven 'mymaven'
 }
@@ -12,7 +20,7 @@ tools {
     stages {
         stage('Build') {
             steps {
-                echo 'mvn clean package'
+                echo " hello $Name ${params.Lastname}"
                 sh 'mvn clean package'  
                   }
         
