@@ -1,82 +1,87 @@
-pipeline {
-    agent {
-        label 'Jenkins-Dev'
-    }
+pipeline
 
-    parameters {
-        string(name: 'Lastname', defaultValue: 'Shaikh')
-        choice(name: 'select_environment', choices: ['dev', 'qa', 'prod'], description: 'Choose deployment environment')
-    }
+{
+    agent {
+  label 'Jenkins-Dev'
+}
+
+parameters {
+  parameters {
+  choice choices: ['dev', 'prod'], name: 'select_environment'
+  }
+
+}
 
     environment {
-        Name = "Muhammad Asif"
-    }
-
-    tools {
-        maven 'mymaven'
-    }
+  Name = "Muhammad Asif"}
+ 
+tools {
+  maven 'mymaven'
+     }
 
     stages {
         stage('Build') {
             steps {
-                echo "Hello $Name ${params.Lastname}"
-                sh 'mvn clean package'
-            }
-        }
+                sh 'mvn clean package -DskipTests=true'  
+                  }
+                
+             }               
 
-        stage('Test') {
-            parallel {
-                stage('testA') {
-                    steps {
-                        echo "This is test A"
-                    }
+        stage('test') {
+            parallel  {
+
+            stage('testA') {
+                agent {
+                    label 'Jenkins-Dev'
                 }
-
-                stage('testB') {
-                    steps {
-                        echo "This is test B"
-                    }
+                steps {echo " This is test A "
+                sh "mvn test"
                 }
             }
-        }
-
-        stage('Stash WAR') {
-            steps {
-                script {
-                    dir("webapp/target/") {
-                        stash name: "maven-build", includes: "*.war"
-                    }
+            stage('testB') {
+                agent {
+                    label 'Jenkins-Dev'
                 }
-            }
-        }
-
-        stage('Deploy to Dev') {
+               steps {echo " This is test B "
+               sh "mvn test"
+               }
+            } 
+         } 
+        
+        post {
+                success {
+                    dir("webapp/target/")
+                    {
+                        stash name: "maven-build", includes: "*.war"         
+                        }
+                }          
+          }
+        }   
+        stage ('deploy_dev')
+        {
             when {
                 expression { params.select_environment == 'dev' }
-            }
+            beforeAgent true
             agent {
                 label 'Jenkins-Dev'
             }
             steps {
-                script {
-                    dir("/var/www/html") {
-                        unstash "maven-build"
-                        sh """
-                            cd /var/www/html
-                            jar -xvf *.war
-                        """
-                    }
+                dir("/var/www/html")
+                {
+                unstash "maven-build"
                 }
-            }
+                sh """ cd /var/www/html
+                jar -xvf webapp.war
+                """
+                }
         }
-    }
+     }
+ }
 
-    post {
-        success {
-            echo "Pipeline completed successfully."
-        }
-        failure {
-            echo "Pipeline failed."
-        }
-    }
+
 }
+
+
+
+
+
