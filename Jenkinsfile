@@ -25,7 +25,6 @@ tools {
                   }
                 
              }               
-            }
 
         stage('Test') {
             parallel  {
@@ -66,6 +65,7 @@ tools {
                 }
         }
     }
+}
 }
 
 
