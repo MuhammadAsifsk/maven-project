@@ -37,7 +37,7 @@ tools {
                steps {echo " This is test B "}
             } 
         } 
-        }
+        
         post {
                 success {
                     dir("webapp/target/")
@@ -63,9 +63,10 @@ tools {
                 sh """ cd /var/www/html
                 jar -xvf *.war
                 """
-            }
+                }
         }
     }
+}
 }
 
 
